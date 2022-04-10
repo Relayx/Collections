@@ -6,9 +6,12 @@
 
 int main() {
   Array_int array;
-  ArrayCtor_int(&array, 10);
+  ArrayCtor_int(&array, 1);
   ArrayPush_int(&array, 20);
-  int a = ArrayGetAt_int(&array, 0);
+  ArrayPush_int(&array, 30);
+  ArrayPush_int(&array, 40);
+  int a;
+  ArrayGetAt_int(&array, 2, &a);
   printf("%d\n", a);
   return 0;
 }

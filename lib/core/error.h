@@ -3,6 +3,21 @@
 
 #include <stdint.h>
 
+#ifdef COLLECTIONS_DUMPING //------------------------------------------------------
+
+#define EXCEPTION(EXPRESSION, ERROR, DUMPER) \
+ if (EXPRESSION) \
+    return DUMPER;
+
+#else // --------------------------------------------------------------------------
+
+#define EXCEPTION(EXPRESSION, ERROR, DUMPER) \
+ if (EXPRESSION) \
+    return (1u << ERROR);
+
+#endif // COLLECTIONS_DUMPING -----------------------------------------------------
+///////////////////////////////////////////////////////////////////////////////////
+
 typedef uint32_t CErrorSet;
 
 typedef enum {

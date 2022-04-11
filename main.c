@@ -8,7 +8,13 @@
 #include "lib/stack.h"
 #undef STACK_TYPE
 
+#define STACK_TYPE double
+#include "lib/stack.h"
+#undef STACK_TYPE
+
+
 void PrintInt(int i) { printf("%d", i); }
+void PrintDouble(double d) { printf("%lg", d); }
 
 int main() {
   Stack_int stk = {}; // Zeroing out the structure
@@ -23,5 +29,10 @@ int main() {
   StackDump(int, &stk);
 
   StackDtor(int, &stk); // Deletes the stack
+
+  Stack_double stack = {0};
+  StackCtor(double, &stack, 5, PrintDouble);
+  StackPush(double, &stack, 53.57);
+  StackDump(double, &stack);
   return 0;
 }

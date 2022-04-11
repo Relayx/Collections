@@ -32,38 +32,27 @@ static const uint8_t EXPAND_VALUE = 2;
 #define StackSize(TYPE, STACK, VALUE) \
   TEMPLATE(_StackSize, TYPE)(STACK, VALUE, GET_CINFO(TYPE, STACK))
 
+#define StackVerify(TYPE, STACK) \
+    TEMPLATE(_StackVerify, TYPE)(STACK)
+
+// ---------------------------->> Dumping for stack <<<----------------------------
+
 #define StackDump(TYPE, STACK) \
   TEMPLATE(_StackDump, TYPE)(STACK, \
   GET_CINFO(TYPE, STACK), \
   TEMPLATE(_StackVerify, TYPE)(STACK))
 
-#define STACK_OK \
+// ------------------------->>> Verification for stack <<<-------------------------
+
+#define __STACK_OK \
 { \
-  CErrorSet error = TEMPLATE(_StackVerify, STACK_TYPE)(stack); \
+  CErrorSet error = StackVerify(STACK_TYPE, stack); \
     if (error != C_OK) \
-      return TEMPLATE(_StackDump, STACK_TYPE)(stack, info, error); \
+      return StackDump(STACK_TYPE, stack); \
 }
 
-// #define DROP_ERROR(EXPRESSION, ERROR) \
-//     if (EXPRESSION) \
-//         return TEMPLATE(_StackDump, STACK_TYPE)(stack, info, (1u << ERROR));
-
-
-// #define StackDump(TYPE, STACK)
-
-// #define STACK_OK \
-// { \
-//     CErrorSet error = TEMPLATE(_StackVerify, STACK_TYPE)(stack); \
-//         if (error != C_OK) \
-//             return error; \
-// }
-
-#define DROP_ERROR(EXPRESSION, ERROR) \
-    if (EXPRESSION) \
-        return (1u << ERROR);
-
-#define StackVerify(TYPE, STACK) \
-    TEMPLATE(_StackVerify, TYPE)(STACK)
+#define __STACK_DROP_ERROR(EXPRESSION, ERROR) \
+  EXCEPTION(EXPRESSION, ERROR, StackDump(STACK_TYPE, stack))
 
 #endif // RELAYX_COLLECTIONS_STACK_UTILITIES --------------------------------------
 ///////////////////////////////////////////////////////////////////////////////////
@@ -245,16 +234,16 @@ CErrorSet TEMPLATE(_StackDump, STACK_TYPE)(STACK* stack, CInfo info, CErrorSet e
 CErrorSet TEMPLATE(_StackCtor, STACK_TYPE)(STACK* stack, size_t capacity, 
                  void (*PrintElement)(STACK_TYPE), CInfo info)
 {
-    DROP_ERROR(!stack, C_NULL_REFERENCE); // !Error
-    DROP_ERROR(stack->data != NULL, C_ALREADY_CONSTRUCTED); // !Error
-    DROP_ERROR(stack->capacity != 0, C_ALREADY_CONSTRUCTED); // !Error
-    DROP_ERROR(stack->size != 0, C_ALREADY_CONSTRUCTED); // !Error
+    __STACK_DROP_ERROR(!stack, C_NULL_REFERENCE); // !Error
+    __STACK_DROP_ERROR(stack->data != NULL, C_ALREADY_CONSTRUCTED); // !Error
+    __STACK_DROP_ERROR(stack->capacity != 0, C_ALREADY_CONSTRUCTED); // !Error
+    __STACK_DROP_ERROR(stack->size != 0, C_ALREADY_CONSTRUCTED); // !Error
 
 #ifdef COLLECTIONS_CANARY_PROTECT
 
     char* memory = (char*) calloc((capacity * sizeof(STACK_TYPE)) + 
                                   (2 * sizeof(CCanary)), sizeof(char));
-    DROP_ERROR(memory == NULL, C_OUT_OF_MEMORY); // !Error
+    __STACK_DROP_ERROR(memory == NULL, C_OUT_OF_MEMORY); // !Error
     memory += sizeof(CCanary);
 
     stack->canaryLeft                                      = CANARY_VALUE;
@@ -265,7 +254,7 @@ CErrorSet TEMPLATE(_StackCtor, STACK_TYPE)(STACK* stack, size_t capacity,
 #else
 
     STACK_TYPE* memory = (STACK_TYPE*) calloc(capacity, sizeof(STACK_TYPE));
-    DROP_ERROR(memory == NULL, C_OUT_OF_MEMORY); // !Error
+    __STACK_DROP_ERROR(memory == NULL, C_OUT_OF_MEMORY); // !Error
 
 #endif // COLLECTIONS_CANARY_PROTECT
 
@@ -282,7 +271,7 @@ CErrorSet TEMPLATE(_StackCtor, STACK_TYPE)(STACK* stack, size_t capacity,
     stack->structHash = HashSum((char*)stack, sizeof(STACK) - sizeof(Chash));
 #endif // COLLECTIONS_HASH_PROTECT
 
-    STACK_OK
+    __STACK_OK
 
     return C_OK;
 }
@@ -291,10 +280,10 @@ CErrorSet TEMPLATE(_StackCtor, STACK_TYPE)(STACK* stack, size_t capacity,
 
 CErrorSet TEMPLATE(_StackDtor, STACK_TYPE)(STACK* stack, CInfo info)
 {
-    DROP_ERROR(!stack, C_NULL_REFERENCE); // !Error
-    DROP_ERROR(stack->data == NULL && stack->capacity == 0 && stack->size == 0, 
+    __STACK_DROP_ERROR(!stack, C_NULL_REFERENCE); // !Error
+    __STACK_DROP_ERROR(stack->data == NULL && stack->capacity == 0 && stack->size == 0, 
                C_ALREADY_DELETED); // !Error
-    STACK_OK
+    __STACK_OK
 
 #ifdef COLLECTIONS_CANARY_PROTECT
 
@@ -321,7 +310,7 @@ CErrorSet TEMPLATE(_StackDtor, STACK_TYPE)(STACK* stack, CInfo info)
 
 CErrorSet TEMPLATE(_StackResize, STACK_TYPE)(STACK* stack, size_t capacity, CInfo info)
 {
-    STACK_OK
+    __STACK_OK
     
     stack->capacity = capacity;
 
@@ -330,7 +319,7 @@ CErrorSet TEMPLATE(_StackResize, STACK_TYPE)(STACK* stack, size_t capacity, CInf
     char* memory = (char*)stack->data - sizeof(CCanary);
     memory = (char*) realloc(memory, (stack->capacity * sizeof(STACK_TYPE)) + 
                                    + (2 * sizeof(CCanary)));
-    DROP_ERROR(memory == NULL, C_OUT_OF_MEMORY); // !Error
+    __STACK_DROP_ERROR(memory == NULL, C_OUT_OF_MEMORY); // !Error
 
     stack->data = (STACK_TYPE*)(memory + sizeof(CCanary));
 
@@ -340,7 +329,7 @@ CErrorSet TEMPLATE(_StackResize, STACK_TYPE)(STACK* stack, size_t capacity, CInf
 #else
 
     char* memory = (char*) realloc(stack->data, stack->capacity * sizeof(STACK_TYPE));
-    DROP_ERROR(memory == NULL, C_OUT_OF_MEMORY); // !Error
+    __STACK_DROP_ERROR(memory == NULL, C_OUT_OF_MEMORY); // !Error
     stack->data = (STACK_TYPE*) memory;
 
 #endif // COLLECTIONS_CANARY_PROTECT
@@ -350,7 +339,7 @@ CErrorSet TEMPLATE(_StackResize, STACK_TYPE)(STACK* stack, size_t capacity, CInf
     stack->structHash = HashSum((char*)stack, sizeof(STACK) - sizeof(Chash));
 #endif // COLLECTIONS_HASH_PROTECT
 
-    STACK_OK
+    __STACK_OK
 
     return C_OK;
 }
@@ -359,7 +348,7 @@ CErrorSet TEMPLATE(_StackResize, STACK_TYPE)(STACK* stack, size_t capacity, CInf
 
 CErrorSet TEMPLATE(_StackPush, STACK_TYPE)(STACK* stack, STACK_TYPE value, CInfo info)
 {
-    STACK_OK
+    __STACK_OK
 
 #ifdef COLLECTIONS_HASH_PROTECT
 
@@ -388,7 +377,7 @@ CErrorSet TEMPLATE(_StackPush, STACK_TYPE)(STACK* stack, STACK_TYPE value, CInfo
     stack->structHash = HashSum((char*)stack, sizeof(STACK) - sizeof(Chash));
 #endif // COLLECTIONS_HASH_PROTECT
 
-    STACK_OK
+    __STACK_OK
 
     return C_OK;
 }
@@ -397,9 +386,9 @@ CErrorSet TEMPLATE(_StackPush, STACK_TYPE)(STACK* stack, STACK_TYPE value, CInfo
 
 CErrorSet TEMPLATE(_StackPop, STACK_TYPE)(STACK* stack, STACK_TYPE* value, CInfo info)
 {
-    STACK_OK
-    DROP_ERROR(!value, C_NULL_REFERENCE); // !Error
-    DROP_ERROR(stack->size == 0, C_BAD_VALUES); // !Error
+    __STACK_OK
+    __STACK_DROP_ERROR(!value, C_NULL_REFERENCE); // !Error
+    __STACK_DROP_ERROR(stack->size == 0, C_BAD_VALUES); // !Error
 
     *value = stack->data[--stack->size];
 
@@ -428,7 +417,7 @@ CErrorSet TEMPLATE(_StackPop, STACK_TYPE)(STACK* stack, STACK_TYPE* value, CInfo
 
 #endif // COLLECTIONS_HASH_PROTECT
 
-    STACK_OK
+    __STACK_OK
 
     return C_OK;
 }
@@ -437,8 +426,8 @@ CErrorSet TEMPLATE(_StackPop, STACK_TYPE)(STACK* stack, STACK_TYPE* value, CInfo
 
 CErrorSet TEMPLATE(_StackSize, STACK_TYPE)(STACK* stack, size_t* size, CInfo info)
 {
-    STACK_OK
-    DROP_ERROR(!size, C_NULL_REFERENCE); // !Error
+    __STACK_OK
+    __STACK_DROP_ERROR(!size, C_NULL_REFERENCE); // !Error
 
     *size = stack->size;
 

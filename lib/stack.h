@@ -36,8 +36,9 @@ static const uint8_t EXPAND_VALUE = 2;
 #define StackVerify(TYPE, STACK) \
     TEMPLATE(_StackVerify, TYPE)(STACK)
 
-#define STACK_FOREACH(VARIABLE, STACK, CODE) \
+#define STACK_FOREACH(TYPE, VARIABLE, STACK, CODE) \
 { \
+  TYPE VARIABLE; \
   for (int i = 0; i < STACK .size; ++i) { \
       VARIABLE = STACK .data[i]; \
       CODE \
@@ -82,7 +83,8 @@ static const uint8_t EXPAND_VALUE = 2;
 #endif // COLLECTIONS_DUMPING -----------------------------------------------------
 
 #define __STACK_DROP_ERROR(EXPRESSION, ERROR) \
-  EXCEPTION(EXPRESSION, ERROR, StackDump(STACK_TYPE, stack))
+  EXCEPTION(EXPRESSION, ERROR, \
+  TEMPLATE(_StackDump, STACK_TYPE)(stack, GET_CINFO(TYPE, STACK), (1u << ERROR)))
 
 #endif // RELAYX_COLLECTIONS_STACK_UTILITIES --------------------------------------
 ///////////////////////////////////////////////////////////////////////////////////

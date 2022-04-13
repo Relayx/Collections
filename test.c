@@ -2,7 +2,7 @@
 
 #define COLLECTIONS_CANARY_PROTECT
 #define COLLECTIONS_HASH_PROTECT
-#define COLLECTIONS_DUMPING
+// #define COLLECTIONS_DUMPING
 
 const char* const RESET ="\033[0m";
 const char* const RED ="\033[1;31m";

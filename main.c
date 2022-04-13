@@ -26,12 +26,10 @@ int main() {
   StackPush(int, &stk, 810);
   StackPush(int, &stk, 666);
 
-  int temp;
-  STACK_FOREACH(temp, stk, 
-    {
-      printf("%d\n", temp);
-    }
-  )
+  STACK_FOREACH(int, temp, stk, {
+    temp -= 1000;
+    printf("%d\n", temp);
+  })
 
   StackDtor(int, &stk); // Deletes the stack
 

@@ -4,4 +4,4 @@
 
 A wonderful modern C library
 
-![Logo](./images/logo.png)
+![Logo](./images/logo.svg)

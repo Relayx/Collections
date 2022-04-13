@@ -25,33 +25,34 @@ typedef enum {
   C_NULL_REFERENCE,
   C_NULL_REFERENCE_DATA,       
   C_OUT_OF_MEMORY,
-  C_OUT_OF_RANGE, 
   C_BAD_VALUES,
-  C_ALREADY_CONSTRUCTED,
-  C_ALREADY_DELETED,
   C_STRUCT_LEFT_CANARY_FAULT,
   C_STRUCT_RIGHT_CANARY_FAULT,
   C_DATA_LEFT_CANARY_FAULT,
   C_DATA_RIGHT_CANARY_FAULT,
   C_STRUCT_HASH_FAULT,
   C_DATA_HASH_FAULT,
+  C_ALREADY_CONSTRUCTED,
+  C_ALREADY_DELETED,
+  C_OUT_OF_RANGE, 
   C_CERROR_SIZE
 } CError;
 
 const char* ERROR_INFO[] = {
-  "OK",                                      /* 0 */
-  "Null pointer reference of stack",         /* 1 */
-  "Null pointer reference of data of stack", /* 2 */
-  "Out of memory",                           /* 3 */
-  "Stack values was spoiled",                /* 4 */
-  "Left canary of struct was damaged",       /* 5 */
-  "Right canary of struct was damaged",      /* 6 */
-  "Left canary of data was damaged",         /* 7 */
-  "Right canary of data was damaged",        /* 8 */
-  "HashSum of struct doesn't match",         /* 9 */
-  "HashSum of data doesn't match",           /* 10 */
-  "Stack has already constructed",           /* 11 */
-  "Stack has already deleted"                /* 12 */
+  "OK",                                     /* 0 */
+  "Null pointer reference of object",       /* 1 */
+  "Null pointer reference of data",         /* 2 */
+  "Out of memory",                          /* 3 */
+  "Object values was spoiled",              /* 4 */
+  "Left canary of struct was damaged",      /* 5 */
+  "Right canary of struct was damaged",     /* 6 */
+  "Left canary of data was damaged",        /* 7 */
+  "Right canary of data was damaged",       /* 8 */
+  "HashSum of struct doesn't match",        /* 9 */
+  "HashSum of data doesn't match",          /* 10 */
+  "Object has already constructed",         /* 11 */
+  "Object has already deleted",             /* 12 */
+  "Out of range"                            /* 13 */
 };
 
 #endif // RELAYX_COLLECTIONS_ERROR

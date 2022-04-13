@@ -36,6 +36,14 @@ static const uint8_t EXPAND_VALUE = 2;
 #define StackVerify(TYPE, STACK) \
     TEMPLATE(_StackVerify, TYPE)(STACK)
 
+#define STACK_FOREACH(VARIABLE, STACK, CODE) \
+{ \
+  for (int i = 0; i < STACK .size; ++i) { \
+      VARIABLE = STACK .data[i]; \
+      CODE \
+  } \
+}
+
 // ---------------------------->> Dumping for stack <<<----------------------------
 #ifdef COLLECTIONS_DUMPING //------------------------------------------------------
 
@@ -254,7 +262,7 @@ CErrorSet TEMPLATE(_StackDump, STACK_TYPE)(STACK* stack, CInfo info, CErrorSet e
 // ------------------------->>> Stack native functions <<<-------------------------
 
 CErrorSet TEMPLATE(_StackCtor, STACK_TYPE)(STACK* stack, size_t capacity /*,*/
-                DUMP_ARG(void (*PrintElement)(STACK_TYPE)) /*,*/ DUMP_ARG(CInfo info))
+          DUMP_ARG(void (*PrintElement)(STACK_TYPE)) /*,*/ DUMP_ARG(CInfo info))
 {
     __STACK_DROP_ERROR(!stack, C_NULL_REFERENCE); // !Error
     __STACK_DROP_ERROR(stack->data != NULL, C_ALREADY_CONSTRUCTED); // !Error
@@ -321,6 +329,7 @@ CErrorSet TEMPLATE(_StackDtor, STACK_TYPE)(STACK* stack /*,*/ DUMP_ARG(CInfo inf
 #endif // COLLECTIONS_CANARY_PROTECT
 
     free(memory);
+
     stack->data     = NULL;
     stack->size     = 0;
     stack->capacity = 0;
@@ -434,4 +443,4 @@ CErrorSet TEMPLATE(_StackSize, STACK_TYPE)(STACK* stack, size_t* size /*,*/ DUMP
 
 #undef STACK
 
-#endif //STACK_TYPE ---------------------------------------------------------------
+#endif // STACK_TYPE --------------------------------------------------------------

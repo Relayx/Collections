@@ -2,7 +2,7 @@
 
 #define COLLECTIONS_CANARY_PROTECT
 #define COLLECTIONS_HASH_PROTECT
-#define COLLECTIONS_DUMPING
+// #define COLLECTIONS_DUMPING
 
 #define STACK_TYPE int
 #include "lib/stack.h"
@@ -12,6 +12,9 @@
 #include "lib/stack.h"
 #undef STACK_TYPE
 
+#define ARRAY_TYPE int
+#include "lib/array.h"
+#undef STACK_TYPE
 
 void PrintInt(int i) { printf("%d", i); }
 void PrintDouble(double d) { printf("%lg", d); }
@@ -23,10 +26,12 @@ int main() {
   StackPush(int, &stk, 810);
   StackPush(int, &stk, 666);
 
-  int temp = 0;
-  StackPop(int, &stk, &temp);
-  printf("%d\n", temp);
-  StackDump(int, &stk);
+  int temp;
+  STACK_FOREACH(temp, stk, 
+    {
+      printf("%d\n", temp);
+    }
+  )
 
   StackDtor(int, &stk); // Deletes the stack
 

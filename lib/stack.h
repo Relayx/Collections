@@ -386,7 +386,7 @@ CErrorSet TEMPLATE(_StackPush, STACK_TYPE)(STACK* stack, STACK_TYPE value /*,*/ 
     if (stack->size >= stack->capacity)
     {
         CErrorSet error = TEMPLATE(_StackResize, STACK_TYPE)
-            (stack, stack->capacity * EXPAND_VALUE /*,*/ DUMP_ARG(info));
+                                  (stack, stack->capacity * EXPAND_VALUE /*,*/ DUMP_ARG(info));
         if (error != C_OK) return error;
     }
     
@@ -420,7 +420,7 @@ CErrorSet TEMPLATE(_StackPop, STACK_TYPE)(STACK* stack, STACK_TYPE* value /*,*/ 
     if (stack->size < stack->capacity / (EXPAND_VALUE * 2)) 
     {
         CErrorSet error = TEMPLATE(_StackResize, STACK_TYPE)
-            (stack, stack->capacity / EXPAND_VALUE /*,*/ DUMP_ARG(info));
+                                  (stack, stack->capacity / EXPAND_VALUE /*,*/ DUMP_ARG(info));
         if (error != C_OK) return error;
     }
 
